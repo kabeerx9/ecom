@@ -70,46 +70,46 @@ export default function Page() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="border-l-4 border-l-emerald-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Products</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">247</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-emerald-600">247</div>
+            <p className="text-xs text-emerald-600">
               +12 from last month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-blue-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Published</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">189</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-blue-600">189</div>
+            <p className="text-xs text-blue-600">
               76% of total
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-orange-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-orange-600">23</div>
+            <p className="text-xs text-orange-600">
               Need restocking
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹2.4L</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-green-600">₹2.4L</div>
+            <p className="text-xs text-green-600">
               +18% from last month
             </p>
           </CardContent>

@@ -8,7 +8,7 @@ export default function Page() {
       {/* Hero Section */}
       <div className="text-center space-y-4 py-12">
         <h1 className="text-4xl font-bold tracking-tight">
-          Welcome to <span className="text-primary">BITS Store</span>
+          Welcome to <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">BITS Store</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Your official destination for BITS Pilani merchandise, campus essentials, and exclusive apparel.
@@ -26,9 +26,14 @@ export default function Page() {
 
       {/* Featured Sections */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card>
+        <Card className="border-emerald-200 hover:border-emerald-300 transition-all hover:shadow-lg">
           <CardHeader>
-            <CardTitle>🏆 Campus Spirit</CardTitle>
+            <CardTitle className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">🏆</span>
+              </div>
+              <span className="text-emerald-700">Campus Spirit</span>
+            </CardTitle>
             <CardDescription>
               Official BITS Pilani apparel and accessories
             </CardDescription>
@@ -40,9 +45,14 @@ export default function Page() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-teal-200 hover:border-teal-300 transition-all hover:shadow-lg">
           <CardHeader>
-            <CardTitle>🎓 Student Essentials</CardTitle>
+            <CardTitle className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-green-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">🎓</span>
+              </div>
+              <span className="text-teal-700">Student Essentials</span>
+            </CardTitle>
             <CardDescription>
               Everything you need for campus life
             </CardDescription>
@@ -54,9 +64,14 @@ export default function Page() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-green-200 hover:border-green-300 transition-all hover:shadow-lg">
           <CardHeader>
-            <CardTitle>⚡ Fast Delivery</CardTitle>
+            <CardTitle className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">⚡</span>
+              </div>
+              <span className="text-green-700">Fast Delivery</span>
+            </CardTitle>
             <CardDescription>
               Quick and reliable campus delivery
             </CardDescription>
@@ -73,14 +88,14 @@ export default function Page() {
       <div className="text-center space-y-4 py-8">
         <h2 className="text-2xl font-semibold">Popular Categories</h2>
         <div className="flex flex-wrap gap-4 justify-center">
-          <Button variant="outline" asChild>
-            <Link href="/category/sneakers">Sneakers</Link>
+          <Button variant="outline" asChild className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-400">
+            <Link href="/category/sneakers">🎯 Sneakers</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link href="/category/merchandise">Merchandise</Link>
+          <Button variant="outline" asChild className="border-teal-300 text-teal-700 hover:bg-teal-50 hover:border-teal-400">
+            <Link href="/category/merchandise">👕 Merchandise</Link>
           </Button>
-          <Button variant="outline" asChild>
-            <Link href="/collections">Collections</Link>
+          <Button variant="outline" asChild className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400">
+            <Link href="/collections">📚 Collections</Link>
           </Button>
         </div>
       </div>

@@ -47,8 +47,8 @@ export default function Navbar() {
     <header className="border-b bg-background">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-semibold">
-            BITS Pilani Store
+          <Link href="/" className="font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent hover:from-emerald-700 hover:to-teal-700 transition-all">
+            BITS Store
           </Link>
           <nav className="hidden md:flex items-center gap-2">
             <NavLink href="/products">Products</NavLink>

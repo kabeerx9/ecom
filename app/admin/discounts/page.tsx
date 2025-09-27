@@ -77,48 +77,48 @@ export default function Page() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+        <Card className="border-l-4 border-l-emerald-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Active Discounts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-emerald-600">
               {sampleDiscounts.filter(d => d.status === "active").length}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-emerald-600">
               Currently running
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-teal-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Usage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">413</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-teal-600">413</div>
+            <p className="text-xs text-teal-600">
               Codes redeemed
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-green-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Revenue Saved</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹24.5K</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-green-600">₹24.5K</div>
+            <p className="text-xs text-green-600">
               This month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-l-4 border-l-blue-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Avg. Discount</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹592</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-blue-600">₹592</div>
+            <p className="text-xs text-blue-600">
               Per redemption
             </p>
           </CardContent>
@@ -150,7 +150,7 @@ export default function Page() {
             <TableBody>
               {sampleDiscounts.map((discount) => (
                 <TableRow key={discount.id}>
-                  <TableCell className="font-medium font-mono">
+                  <TableCell className="font-medium font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
                     {discount.code}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
@@ -246,15 +246,15 @@ export default function Page() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm">Most Used Code</span>
-                <span className="font-medium">FESTIVAL (123 uses)</span>
+                <span className="font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">FESTIVAL (123 uses)</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Highest Savings</span>
-                <span className="font-medium">₹8,450 (WELCOME20)</span>
+                <span className="font-medium text-green-600 bg-green-50 px-2 py-1 rounded">₹8,450 (WELCOME20)</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Conversion Rate</span>
-                <span className="font-medium">24.3%</span>
+                <span className="font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded font-bold">24.3%</span>
               </div>
             </div>
           </CardContent>

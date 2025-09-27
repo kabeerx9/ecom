@@ -76,6 +76,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Custom BITS Store brand colors */
+  --brand-emerald: oklch(0.546 0.145 163.225); /* emerald-600 */
+  --brand-teal: oklch(0.602 0.118 181.962); /* teal-600 */
+  --brand-green: oklch(0.518 0.105 142.236); /* green-700 */
+  --brand-emerald-light: oklch(0.95 0.02 163.225); /* light emerald */
+  --brand-gradient: linear-gradient(135deg, oklch(0.546 0.145 163.225), oklch(0.602 0.118 181.962));
 }
 
 .dark {

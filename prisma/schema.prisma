@@ -47,6 +47,9 @@ model user {
   updatedAt     DateTime
   account       account[]
   session       session[]
+  address       address[]
+  cart          cart?
+  order         order[]
 }
 
 model verification {
@@ -56,4 +59,207 @@ model verification {
   expiresAt  DateTime
   createdAt  DateTime?
   updatedAt  DateTime?
+}
+
+// -------------------------------
+// E-commerce models (from BACKEND_PLAN.md)
+// -------------------------------
+
+// Product catalog
+model product {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  name        String
+  description String?
+  status      product_status @default(published)
+  isFeatured  Boolean        @default(false)
+
+  categoryId String?
+  category   category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  images      product_image[]
+  variants    product_variant[]
+  collections product_collection[]
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  order_item order_item[]
+}
+
+model product_image {
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+  product   product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model product_variant {
+  id             String       @id @default(cuid())
+  productId      String
+  product        product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku            String       @unique
+  size           String?
+  color          String?
+  priceMinor     Int
+  salePriceMinor Int?
+  stock          Int          @default(0)
+  isDefault      Boolean      @default(false)
+  // MVP "deal of the day" (UI only, can filter/highlight)
+  isDealOfDay    Boolean      @default(false)
+  dealStartAt    DateTime?
+  dealEndAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  cart_item      cart_item[]
+  order_item     order_item[]
+}
+
+model category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  products product[]
+}
+
+model collection {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  title       String
+  description String?
+  color       String?
+  products    product_collection[]
+}
+
+model product_collection {
+  productId    String
+  collectionId String
+  product      product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([productId, collectionId])
+}
+
+// Account data
+model address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String
+  name       String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  phone      String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Cart (one active cart per user)
+model cart {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  user      user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     cart_item[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model cart_item {
+  id               String          @id @default(cuid())
+  cartId           String
+  productVariantId String
+  quantity         Int             @default(1)
+  cart             cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant          product_variant @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
+}
+
+// Orders (payments will be added later)
+model order {
+  id            String         @id @default(cuid())
+  number        String         @unique
+  userId        String
+  user          user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        order_status   @default(pending)
+  paymentStatus payment_status @default(pending)
+  currency      String         @default("INR")
+  subtotalMinor Int
+  discountMinor Int            @default(0)
+  shippingMinor Int            @default(0)
+  taxMinor      Int            @default(0)
+  totalMinor    Int
+  placedAt      DateTime?
+
+  // Shipping snapshot
+  shipName       String?
+  shipLine1      String?
+  shipLine2      String?
+  shipCity       String?
+  shipState      String?
+  shipPostalCode String?
+  shipCountry    String?
+  shipPhone      String?
+
+  items    order_item[]
+  payments payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model order_item {
+  id               String           @id @default(cuid())
+  orderId          String
+  productId        String?
+  productVariantId String?
+  nameSnapshot     String
+  priceMinor       Int
+  quantity         Int              @default(1)
+  order            order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          product?         @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant          product_variant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+}
+
+model payment {
+  id                String           @id @default(cuid())
+  orderId           String
+  order             order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider          payment_provider
+  providerOrderId   String?
+  providerPaymentId String?
+  amountMinor       Int
+  status            payment_status
+  payload           Json?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+enum product_status {
+  draft
+  published
+}
+
+enum order_status {
+  pending
+  paid
+  shipped
+  delivered
+  cancelled
+}
+
+enum payment_status {
+  pending
+  authorized
+  captured
+  failed
+}
+
+enum payment_provider {
+  razorpay
+  college_gateway
 }

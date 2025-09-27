@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
   // If authenticated, keep users away from login/signup
   if (sessionCookie && isPublicPath) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // If not authenticated, block everything except public paths

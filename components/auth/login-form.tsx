@@ -26,7 +26,7 @@ export function LoginForm({
       setLoading(true);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/",
       });
     } catch (error) {
       setError("Failed to sign in with Google");

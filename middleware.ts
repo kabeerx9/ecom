@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
+// Global auth guard: everything requires auth except login/signup and internals
 export async function middleware(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request);
-
   const { pathname } = request.nextUrl;
 
-  // Redirect authenticated users away from login/signup pages
-  if (sessionCookie && ["/login", "/signup"].includes(pathname)) {
+  // Public paths that should always be accessible
+  const publicPaths = ["/login", "/signup", "/403"];
+  const isPublicPath = publicPaths.includes(pathname);
+
+  // Read session cookie via Better Auth
+  const sessionCookie = getSessionCookie(request);
+
+  // If authenticated, keep users away from login/signup
+  if (sessionCookie && isPublicPath) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Redirect unauthenticated users trying to access protected routes
-  if (!sessionCookie && (pathname.startsWith("/dashboard") || pathname.startsWith("/admin"))) {
+  // If not authenticated, block everything except public paths
+  if (!sessionCookie && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -20,6 +26,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Apply middleware to auth pages and protected segments
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/signup"],
+  // Match all paths except next internals, images, favicon and API routes
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

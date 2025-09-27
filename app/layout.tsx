@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auth System",
-  description: "Auth System",
+  title: "BITS Store",
+  description: "Official BITS Pilani merchandise and campus essentials store",
 };
 
 export default function RootLayout({

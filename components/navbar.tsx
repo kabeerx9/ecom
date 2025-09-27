@@ -15,6 +15,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import LogoutButton from "@/components/auth/logout-button";
 
+type UserWithRole = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  image?: string | null;
+  role: string;
+};
+
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const active = pathname === href;
@@ -30,7 +41,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 export default function Navbar() {
   const { data: session } = authClient.useSession();
-  const user = session?.user;
+  const user = session?.user as UserWithRole;
 
   return (
     <header className="border-b bg-background">
@@ -106,4 +117,3 @@ export default function Navbar() {
     </header>
   );
 }
-

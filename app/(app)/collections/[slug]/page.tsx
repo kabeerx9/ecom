@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import ProductCard from "@/components/product-card";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -9,12 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { COLLECTIONS, PRODUCTS } from "@/lib/demo-data";
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const collection = COLLECTIONS.find((c) => c.slug === params.slug);
+export default function Page() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const collection = COLLECTIONS.find((c) => c.slug === slug);
   const [sort, setSort] = useState("popular");
 
   const items = useMemo(() => {
-    let list = PRODUCTS.filter((p) => p.collections?.includes(params.slug));
+    let list = PRODUCTS.filter((p) => p.collections?.includes(slug));
     switch (sort) {
       case "price-asc": list.sort((a,b)=>a.price-b.price); break;
       case "price-desc": list.sort((a,b)=>b.price-a.price); break;
@@ -22,7 +25,7 @@ export default function Page({ params }: { params: { slug: string } }) {
       default: list.sort((a,b)=>(b.rating??0)-(a.rating??0));
     }
     return list;
-  }, [sort, params.slug]);
+  }, [sort, slug]);
 
   return (
     <div className="space-y-6">
@@ -35,7 +38,7 @@ export default function Page({ params }: { params: { slug: string } }) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{collection?.title ?? params.slug}</BreadcrumbPage>
+            <BreadcrumbPage>{collection?.title ?? slug}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -45,7 +48,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         style={{ background: collection?.color || "linear-gradient(135deg,#f8fafc,#e2e8f0)" }}
       >
         <div className="backdrop-blur-[1px]">
-          <h1 className="text-xl font-semibold">{collection?.title ?? params.slug}</h1>
+          <h1 className="text-xl font-semibold">{collection?.title ?? slug}</h1>
           <p className="text-sm text-muted-foreground max-w-2xl">{collection?.description ?? "A curated selection for campus."}</p>
         </div>
       </div>

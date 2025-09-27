@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useParams } from "next/navigation";
 import ProductCard from "@/components/product-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { PRODUCTS } from "@/lib/demo-data";
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const title = params.slug === "sneakers" ? "Sneakers" : params.slug === "merchandise" ? "Merchandise" : params.slug;
+export default function Page() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const title = slug === "sneakers" ? "Sneakers" : slug === "merchandise" ? "Merchandise" : slug;
   const isSneakers = title === "Sneakers";
   const [onSale, setOnSale] = useState(false);
   const [sort, setSort] = useState("popular");

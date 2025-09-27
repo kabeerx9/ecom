@@ -126,3 +126,13 @@
     @apply mx-auto px-4 lg:px-0;
   }
 }
+
+/* App-wide background container */
+@layer utilities {
+  .app-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+}

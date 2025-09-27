@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const ADMIN_EMAILS = ["kabeer786joshi@gmail.com"];
+const ADMIN_EMAILS = ["kabeer786joshi@gmail.com" , "surajremous@gmail.com"];
 
 export const auth = betterAuth({
   socialProviders: {

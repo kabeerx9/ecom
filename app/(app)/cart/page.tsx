@@ -2,21 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { cartQueries, cartMutations } from "@/features/cart/queries";
-import { useState } from "react";
 
 export default function Page() {
   const { data, isLoading, isError, error } = useQuery(cartQueries.getCart());
   const qc = useQueryClient();
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [removingId, setRemovingId] = useState<string | null>(null);
   const updateItem = useMutation({
     ...cartMutations.updateItem(),
-    onMutate: (vars) => {
-      setUpdatingId(vars.id);
-    },
-    onSettled: () => {
-      setUpdatingId(null);
-    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["cart"] });
       qc.invalidateQueries({ queryKey: ["cartCount"] });
@@ -24,12 +15,6 @@ export default function Page() {
   });
   const removeItem = useMutation({
     ...cartMutations.removeItem(),
-    onMutate: (vars) => {
-      setRemovingId(vars.id);
-    },
-    onSettled: () => {
-      setRemovingId(null);
-    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["cart"] });
       qc.invalidateQueries({ queryKey: ["cartCount"] });
@@ -88,27 +73,27 @@ export default function Page() {
                 <div className="flex items-center gap-2 mt-1">
                   <button
                     className="h-6 w-6 border rounded disabled:opacity-50"
-                    disabled={updatingId === it.id}
+                    disabled={(updateItem.isPending && updateItem.variables?.id === it.id) || (removeItem.isPending && removeItem.variables?.id === it.id)}
                     onClick={() => updateItem.mutate({ id: it.id, quantity: it.quantity - 1 })}
                   >
                     −
                   </button>
                   <div className="text-xs min-w-6 text-center">
-                    {updatingId === it.id ? "…" : it.quantity}
+                    {(updateItem.isPending && updateItem.variables?.id === it.id) || (removeItem.isPending && removeItem.variables?.id === it.id) ? "…" : it.quantity}
                   </div>
                   <button
                     className="h-6 w-6 border rounded disabled:opacity-50"
-                    disabled={updatingId === it.id || it.quantity >= it.variant.stock}
+                    disabled={(updateItem.isPending && updateItem.variables?.id === it.id) || (removeItem.isPending && removeItem.variables?.id === it.id) || it.quantity >= it.variant.stock}
                     onClick={() => updateItem.mutate({ id: it.id, quantity: it.quantity + 1 })}
                   >
                     +
                   </button>
                   <button
                     className="ml-2 text-xs text-destructive underline disabled:opacity-50"
-                    disabled={removingId === it.id}
+                    disabled={removeItem.isPending && removeItem.variables?.id === it.id}
                     onClick={() => removeItem.mutate({ id: it.id })}
                   >
-                    {removingId === it.id ? "Removing…" : "Remove"}
+                    {removeItem.isPending && removeItem.variables?.id === it.id ? "Removing…" : "Remove"}
                   </button>
                 </div>
               </div>

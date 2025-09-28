@@ -1,8 +1,9 @@
 import prisma from "@/lib/prisma";
 import { ok, error } from "@/lib/api";
 
-export async function GET(_req: Request, ctx: { params: { slug: string } }) {
-  const slug = ctx.params?.slug;
+export async function GET(_req: Request, ctx: { params: Promise<{ slug: string }> }) {
+  const params = await ctx.params;
+  const slug = params?.slug;
   if (!slug) return error("Missing slug", 400);
 
   const product = await prisma.product.findFirst({
@@ -51,4 +52,3 @@ export async function GET(_req: Request, ctx: { params: { slug: string } }) {
     collections,
   });
 }
-

@@ -1,10 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { productQueries } from "@/features/products/queries";
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const slug = params?.slug;
+export default function Page() {
+  const params = useParams();
+  const slug = params?.slug as string;
   const { data, isLoading, isError, error } = useQuery(
     slug ? productQueries.fetchProduct(slug) : { queryKey: ["product", "missing"], queryFn: async () => { throw new Error("Missing slug"); } }
   );

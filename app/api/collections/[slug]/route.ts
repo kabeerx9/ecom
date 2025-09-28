@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   if (!collection) return error("Collection not found", 404);
 
   const productSlugs = withProducts
-    ? collection.products.map((pc) => pc.product.slug)
+    ? (collection as typeof collection & { products: { product: { slug: string } }[] }).products.map((pc) => pc.product.slug)
     : undefined;
 
   return ok({
@@ -37,4 +37,3 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     productSlugs,
   });
 }
-

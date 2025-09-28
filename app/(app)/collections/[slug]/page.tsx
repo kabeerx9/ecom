@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 export default function Page() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError, error } = useQuery(
-    slug ? collectionQueries.detail(slug, { withProducts: true }) : { queryKey: ["collection", "missing"], queryFn: async () => { throw new Error("Missing slug"); } }
+    slug ? collectionQueries.detail(slug, { withProducts: true }) : { queryKey: ["collection", "missing", false], queryFn: async () => { throw new Error("Missing slug"); } }
   );
 
   if (isLoading) {
@@ -59,4 +59,3 @@ export default function Page() {
     </div>
   );
 }
-

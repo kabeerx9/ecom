@@ -201,10 +201,10 @@ API Plan (Route Handlers) — TODO
 - [ ] GET `app/api/products/[slug]/route.ts`
  - [x] GET `app/api/products/[slug]/route.ts`
   - Used by: `app/(app)/product/[slug]/page.tsx`
-- [ ] GET `app/api/collections/route.ts`
+- [x] GET `app/api/collections/route.ts`
   - Returns collections (+ optional product counts)
   - Used by: `app/(app)/collections/page.tsx`
-- [ ] GET `app/api/collections/[slug]/route.ts`
+- [x] GET `app/api/collections/[slug]/route.ts`
   - Returns collection meta and/or product slugs
   - Used by: `app/(app)/collections/[slug]/page.tsx`
 

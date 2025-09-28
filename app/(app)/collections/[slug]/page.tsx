@@ -1,82 +1,62 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { collectionQueries } from "@/features/collections/queries";
 import { useParams } from "next/navigation";
-import ProductCard from "@/components/product-card";
-import { Badge } from "@/components/ui/badge";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { COLLECTIONS, PRODUCTS } from "@/lib/demo-data";
 
 export default function Page() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const collection = COLLECTIONS.find((c) => c.slug === slug);
-  const [sort, setSort] = useState("popular");
+  const { slug } = useParams<{ slug: string }>();
+  const { data, isLoading, isError, error } = useQuery(
+    slug ? collectionQueries.detail(slug, { withProducts: true }) : { queryKey: ["collection", "missing"], queryFn: async () => { throw new Error("Missing slug"); } }
+  );
 
-  const items = useMemo(() => {
-    let list = PRODUCTS.filter((p) => p.collections?.includes(slug));
-    switch (sort) {
-      case "price-asc": list.sort((a,b)=>a.price-b.price); break;
-      case "price-desc": list.sort((a,b)=>b.price-a.price); break;
-      case "newest": list.sort((a,b)=>Number(b.isNew)-Number(a.isNew)); break;
-      default: list.sort((a,b)=>(b.rating??0)-(a.rating??0));
-    }
-    return list;
-  }, [sort, slug]);
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-7 w-2/3 bg-accent animate-pulse rounded" />
+        <div className="h-4 w-1/2 bg-accent animate-pulse rounded" />
+        <div className="h-4 w-2/3 bg-accent animate-pulse rounded" />
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return <div className="text-sm text-destructive">{String((error as Error)?.message || "Collection not found")}</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/collections">Collections</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{collection?.title ?? slug}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div
-        className="rounded-lg p-6 border"
-        style={{ background: collection?.color || "linear-gradient(135deg,#f8fafc,#e2e8f0)" }}
-      >
-        <div className="backdrop-blur-[1px]">
-          <h1 className="text-xl font-semibold">{collection?.title ?? slug}</h1>
-          <p className="text-sm text-muted-foreground max-w-2xl">{collection?.description ?? "A curated selection for campus."}</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold flex items-center gap-2">
+          {data.title}
+          {data.color ? <span className="inline-block w-3 h-3 rounded-full" style={{ background: data.color }} /> : null}
+        </h1>
+        {data.description ? (
+          <p className="text-sm text-muted-foreground mt-1">{data.description}</p>
+        ) : null}
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="text-xs text-muted-foreground">
-          <Badge variant="secondary">{items.length}</Badge> items in this collection
-        </div>
-        <div className="ml-auto flex items-center gap-2">
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Sort by" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="popular">Popularity</SelectItem>
-              <SelectItem value="price-asc">Price: Low to High</SelectItem>
-              <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              <SelectItem value="newest">Newest</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <a href={`/products?collection=${encodeURIComponent(data.slug)}`} className="inline-flex items-center gap-2 px-3 py-2 rounded bg-primary text-primary-foreground">
+          Browse products in this collection
+        </a>
       </div>
 
-      <Separator />
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {items.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      {data.productSlugs && data.productSlugs.length > 0 ? (
+        <div>
+          <h2 className="text-base font-semibold mb-2">Product Slugs</h2>
+          <div className="flex flex-wrap gap-2">
+            {data.productSlugs.map((ps) => (
+              <a key={ps} href={`/product/${ps}`} className="text-xs border px-2 py-1 rounded hover:bg-accent">
+                {ps}
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No products linked yet.</p>
+      )}
     </div>
   );
 }
+

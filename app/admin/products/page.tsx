@@ -1,183 +1,55 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { IconPlus, IconEdit, IconEye } from "@tabler/icons-react";
+"use client";
 
-// Sample product data
-const sampleProducts = [
-  {
-    id: "1",
-    name: "BITS Classic Hoodie",
-    category: "Merchandise",
-    status: "published",
-    price: "₹1,299",
-    stock: 45,
-  },
-  {
-    id: "2",
-    name: "Campus Sneakers",
-    category: "Sneakers",
-    status: "published",
-    price: "₹2,499",
-    stock: 23,
-  },
-  {
-    id: "3",
-    name: "BITS Logo T-Shirt",
-    category: "Merchandise",
-    status: "draft",
-    price: "₹599",
-    stock: 0,
-  },
-  {
-    id: "4",
-    name: "Engineering Kit",
-    category: "Merchandise",
-    status: "published",
-    price: "₹899",
-    stock: 12,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { adminProductQueries } from "@/features/admin/products/queries";
+import { useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
+  const [q, setQ] = useState("");
+  const { data, isLoading, isError, error, refetch } = useQuery(adminProductQueries.list({ search: q || undefined }));
+
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Products</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your store's product catalog
-          </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 w-full max-w-md">
+          <Input placeholder="Search products…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && refetch()} />
+          <Button size="sm" onClick={() => refetch()}>Search</Button>
         </div>
         <Button asChild>
-          <Link href="/admin/products/new">
-            <IconPlus className="size-4 mr-2" />
-            Add Product
-          </Link>
+          <a href="/admin/products/new">New Product</a>
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-l-4 border-l-emerald-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">247</div>
-            <p className="text-xs text-emerald-600">
-              +12 from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Published</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">189</div>
-            <p className="text-xs text-blue-600">
-              76% of total
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-orange-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">23</div>
-            <p className="text-xs text-orange-600">
-              Need restocking
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">₹2.4L</div>
-            <p className="text-xs text-green-600">
-              +18% from last month
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Products Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Products</CardTitle>
-          <CardDescription>
-            A list of all products in your store
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead className="hidden sm:table-cell">Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Price</TableHead>
-                <TableHead className="hidden md:table-cell">Stock</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sampleProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">
-                    {product.name}
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {product.category}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={product.status === "published" ? "default" : "secondary"}
-                    >
-                      {product.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {product.price}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {product.stock}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/products/${product.id}`}>
-                          <IconEye className="size-4" />
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/products/${product.id}/edit`}>
-                          <IconEdit className="size-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-12 bg-accent animate-pulse rounded" />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="text-sm text-destructive">{String((error as Error)?.message || "Failed to load")}</div>
+      ) : (
+        <div className="space-y-2">
+          {data?.items.map((p) => (
+            <div key={p.id} className="grid grid-cols-12 items-center gap-2 border rounded p-2 bg-card">
+              <div className="col-span-4">
+                <a href={`/admin/products/${p.id}`} className="font-medium hover:underline">{p.name}</a>
+                <div className="text-xs text-muted-foreground">{p.slug}</div>
+              </div>
+              <div className="col-span-3 text-sm">{p.category?.name ?? "—"}</div>
+              <div className="col-span-2 text-xs">
+                <span className="inline-block rounded px-2 py-0.5 border text-[10px] uppercase">{p.status}</span>
+              </div>
+              <div className="col-span-3 text-right text-xs text-muted-foreground">
+                {new Date(p.updatedAt).toLocaleString()}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+

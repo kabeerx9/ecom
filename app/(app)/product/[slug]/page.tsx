@@ -44,6 +44,14 @@ export default function Page() {
     },
   });
 
+
+  const cover = data?.images?.[0];
+  const v = data?.variants?.[0];
+  const existingItem = useMemo(() => {
+    if (!v || !cart) return undefined;
+    return cart.items.find((it) => it.variant.id === v.id);
+  }, [cart, v]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -64,12 +72,6 @@ export default function Page() {
     return <div className="text-sm text-destructive">{String((error as Error)?.message || "Product not found")}</div>;
   }
 
-  const cover = data.images?.[0];
-  const v = data.variants?.[0];
-  const existingItem = useMemo(() => {
-    if (!v || !cart) return undefined;
-    return cart.items.find((it) => it.variant.id === v.id);
-  }, [cart, v]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -1,4 +1,4 @@
-import { ProductsResponse, ProductListQuery } from "@/features/products/types";
+import { ProductsResponse, ProductListQuery, ProductDetail } from "@/features/products/types";
 
 function toParams(input: ProductListQuery) {
   const params = new URLSearchParams();
@@ -25,5 +25,13 @@ export const productQueries = {
     queryKey: ["products", vars] as const,
     queryFn: () => fetchProductsFn(vars),
   }),
+  fetchProduct: (slug: string) => ({
+    queryKey: ["product", slug] as const,
+    queryFn: async (): Promise<ProductDetail> => {
+      const res = await fetch(`/api/products/${encodeURIComponent(slug)}`, { cache: "no-store" });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || "Not found");
+      return json.data as ProductDetail;
+    },
+  }),
 };
-

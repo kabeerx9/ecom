@@ -28,3 +28,34 @@ export type ProductListQuery = {
   pageSize?: number;
 };
 
+export type ProductVariant = {
+  id: string;
+  sku: string;
+  size: string | null;
+  color: string | null;
+  priceMinor: number;
+  salePriceMinor: number | null;
+  stock: number;
+  isDefault: boolean;
+  isDealOfDay: boolean;
+  dealStartAt: string | null;
+  dealEndAt: string | null;
+};
+
+export type ProductImage = {
+  url: string;
+  alt: string | null;
+  sortOrder: number;
+};
+
+export type ProductDetail = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  isFeatured: boolean;
+  images: ProductImage[];
+  variants: ProductVariant[];
+  category: { slug: string; name: string } | null;
+  collections: { slug: string; title: string }[];
+};

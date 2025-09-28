@@ -199,6 +199,7 @@ API Plan (Route Handlers) — TODO
   - Query: `search?`, `category?`, `collection?`, `onSale?`, `sort?`, `page?`, `pageSize?`
   - Used by: `app/(app)/products/page.tsx`, `app/(app)/category/[slug]/page.tsx`, `app/(app)/discounts/page.tsx`
 - [ ] GET `app/api/products/[slug]/route.ts`
+ - [x] GET `app/api/products/[slug]/route.ts`
   - Used by: `app/(app)/product/[slug]/page.tsx`
 - [ ] GET `app/api/collections/route.ts`
   - Returns collections (+ optional product counts)

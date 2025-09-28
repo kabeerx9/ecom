@@ -195,7 +195,7 @@ API Plan (Route Handlers) — TODO
 - [ ] Seed categories (`sneakers`, `merchandise`), a few collections, products + variants + images
 
 1) Public Read APIs (wire Products/Category/Collections UI)
-- [ ] GET `app/api/products/route.ts`
+- [x] GET `app/api/products/route.ts`
   - Query: `search?`, `category?`, `collection?`, `onSale?`, `sort?`, `page?`, `pageSize?`
   - Used by: `app/(app)/products/page.tsx`, `app/(app)/category/[slug]/page.tsx`, `app/(app)/discounts/page.tsx`
 - [ ] GET `app/api/products/[slug]/route.ts`
@@ -282,4 +282,3 @@ Implementation Tips
 - Use database transactions for order creation + stock decrement
 - Keep `salePriceMinor`/`isDealOfDay` on variants to avoid complex discount joins
 - Add necessary Prisma indexes before large queries (slug, sku, joins)
-

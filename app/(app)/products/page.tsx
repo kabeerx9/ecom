@@ -1,179 +1,110 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import ProductCard from "@/components/product-card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconFilter, IconSearch } from "@tabler/icons-react";
+import { useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { productQueries } from "@/features/products/queries";
+import type { ProductListQuery } from "@/features/products/types";
 
-import { PRODUCTS } from "@/lib/demo-data";
+function useProductListQuery(): ProductListQuery {
+  const sp = useSearchParams();
+  return useMemo(() => {
+    const obj: ProductListQuery = {};
+    const s = sp.get("search");
+    const c = sp.get("category");
+    const col = sp.get("collection");
+    const onSale = sp.get("onSale");
+    const sort = sp.get("sort") as ProductListQuery["sort"] | null;
+    const page = sp.get("page");
+    const pageSize = sp.get("pageSize");
+    if (s) obj.search = s;
+    if (c) obj.category = c;
+    if (col) obj.collection = col;
+    if (onSale != null) obj.onSale = onSale === "true" || onSale === "1";
+    if (sort) obj.sort = sort;
+    if (page) obj.page = Number(page) || 1;
+    if (pageSize) obj.pageSize = Number(pageSize) || 12;
+    return obj;
+  }, [sp]);
+}
 
 export default function Page() {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<"All" | "Sneakers" | "Merchandise">("All");
-  const [onSale, setOnSale] = useState(false);
-  const [sort, setSort] = useState("popular");
-
-  const filtered = useMemo(() => {
-    let items = PRODUCTS.slice();
-    if (query) {
-      const q = query.toLowerCase();
-      items = items.filter((p) => p.name.toLowerCase().includes(q));
-    }
-    if (category !== "All") {
-      items = items.filter((p) => p.category === category);
-    }
-    if (onSale) {
-      items = items.filter((p) => (p.originalPrice ?? p.price) > p.price);
-    }
-    switch (sort) {
-      case "price-asc":
-        items.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        items.sort((a, b) => b.price - a.price);
-        break;
-      case "newest":
-        items.sort((a, b) => Number(b.isNew) - Number(a.isNew));
-        break;
-      default:
-        items.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    }
-    return items;
-  }, [query, category, onSale, sort]);
-
-  const FiltersPanel = () => (
-    <div className="space-y-6">
-      <div>
-        <Label className="text-xs text-muted-foreground">Category</Label>
-        <div className="mt-2 flex flex-col gap-2">
-          {["All", "Sneakers", "Merchandise"].map((c) => (
-            <label key={c} className="flex items-center gap-2 text-sm">
-              <Checkbox checked={category === (c as any)} onCheckedChange={() => setCategory(c as any)} />
-              {c}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground">Filters</Label>
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox checked={onSale} onCheckedChange={(v) => setOnSale(Boolean(v))} />
-          On sale
-        </label>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground">Sort by</Label>
-        <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Sort" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="popular">Popularity</SelectItem>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-            <SelectItem value="newest">Newest</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Button variant="outline" size="sm" onClick={() => { setQuery(""); setCategory("All"); setOnSale(false); setSort("popular"); }}>
-        Reset filters
-      </Button>
-    </div>
-  );
+  const vars = useProductListQuery();
+  const { data, isLoading, isError, error } = useQuery(productQueries.fetchProducts(vars));
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold">Products</h1>
-        <p className="text-sm text-muted-foreground">Explore official BITS Pilani sneakers and merchandise.</p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Products</h1>
+          <p className="text-sm text-muted-foreground">
+            {isLoading ? "Loading..." : isError ? String((error as Error)?.message || "Error") : `Showing ${data?.items.length ?? 0} of ${data?.total ?? 0}`}
+          </p>
+        </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-2">
-        <div className="relative w-full md:w-1/2">
-          <IconSearch className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products" className="pl-8" />
-        </div>
-        <div className="hidden md:flex items-center gap-2 ml-auto">
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Sort by" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="popular">Popularity</SelectItem>
-              <SelectItem value="price-asc">Price: Low to High</SelectItem>
-              <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              <SelectItem value="newest">Newest</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="hidden lg:flex items-center gap-2">
-            <Badge variant={category === "All" ? "default" : "outline"} className="cursor-pointer" onClick={() => setCategory("All")}>All</Badge>
-            <Badge variant={category === "Sneakers" ? "default" : "outline"} className="cursor-pointer" onClick={() => setCategory("Sneakers")}>Sneakers</Badge>
-            <Badge variant={category === "Merchandise" ? "default" : "outline"} className="cursor-pointer" onClick={() => setCategory("Merchandise")}>Merchandise</Badge>
-          </div>
-        </div>
-
-        {/* Mobile filter trigger */}
-        <Drawer>
-          <DrawerTrigger asChild>
-            <Button variant="outline" size="sm" className="md:hidden ml-auto">
-              <IconFilter size={16} className="mr-1" /> Filters
-            </Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle className="text-base">Filters</DrawerTitle>
-            </DrawerHeader>
-            <div className="px-4 pb-4">
-              <FiltersPanel />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {data?.items.map((p) => (
+          <a key={p.id} href={`/product/${p.slug}`} className="border rounded-lg overflow-hidden hover:shadow-sm transition bg-card">
+            <div className="aspect-square bg-muted relative">
+              {p.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.image} alt={p.imageAlt || p.name} className="object-cover w-full h-full" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
+              )}
             </div>
-          </DrawerContent>
-        </Drawer>
+            <div className="p-3">
+              <div className="text-sm font-medium line-clamp-1">{p.name}</div>
+              <div className="text-xs text-muted-foreground line-clamp-1">{p.category?.name ?? "Uncategorized"}</div>
+              <div className="mt-1 text-sm">
+                {p.salePriceMinor != null ? (
+                  <>
+                    <span className="font-semibold">₹{(p.salePriceMinor / 100).toFixed(2)}</span>
+                    <span className="ml-2 line-through text-muted-foreground">₹{(Number(p.priceMinor) / 100).toFixed(2)}</span>
+                  </>
+                ) : (
+                  <span className="font-semibold">{p.priceMinor != null ? `₹${(p.priceMinor / 100).toFixed(2)}` : "—"}</span>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
       </div>
 
-      <Separator />
-
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        {/* Sidebar filters (desktop) */}
-        <aside className="hidden md:block">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Filters</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FiltersPanel />
-            </CardContent>
-          </Card>
-        </aside>
-
-        {/* Products grid */}
-        <section>
-          <div className="mb-3 text-xs text-muted-foreground">{filtered.length} products</div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-
-          {/* Pagination (static) */}
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <Button variant="outline" size="sm">Previous</Button>
-            <Button size="sm">1</Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">Next</Button>
-          </div>
-        </section>
-      </div>
+      {/* Simple pager */}
+      {data && (
+        <div className="flex items-center justify-center gap-3">
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            disabled={(vars.page ?? 1) <= 1}
+            onClick={() => {
+              const p = new URLSearchParams(window.location.search);
+              const cur = Number(p.get("page") || 1);
+              const next = Math.max(cur - 1, 1);
+              if (next <= 1) p.delete("page"); else p.set("page", String(next));
+              router.push(`/products${p.toString() ? `?${p.toString()}` : ""}`);
+            }}
+          >
+            Previous
+          </button>
+          <div className="text-sm">Page {vars.page ?? 1}</div>
+          <button
+            className="px-3 py-1 border rounded disabled:opacity-50"
+            disabled={!data.hasNextPage}
+            onClick={() => {
+              const p = new URLSearchParams(window.location.search);
+              const cur = Number(p.get("page") || 1);
+              const next = cur + 1;
+              p.set("page", String(next));
+              router.push(`/products${p.toString() ? `?${p.toString()}` : ""}`);
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

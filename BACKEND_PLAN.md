@@ -209,13 +209,13 @@ API Plan (Route Handlers) — TODO
   - Used by: `app/(app)/collections/[slug]/page.tsx`
 
 2) Cart (authenticated)
-- [ ] GET `app/api/cart/route.ts` → return active cart (create if missing)
-  - Used by: `app/(app)/cart/page.tsx`, navbar badge (later)
-- [ ] POST `app/api/cart/items/route.ts` → add item `{ productVariantId, quantity }`
-  - Used by: ProductCard “Add to cart”
-- [ ] PATCH `app/api/cart/items/[id]/route.ts` → update quantity
-  - Used by: cart page quantity controls
-- [ ] DELETE `app/api/cart/items/[id]/route.ts` → remove item
+- [x] GET `app/api/cart/route.ts` → return active cart (create if missing)
+  - Used by: `app/(app)/cart/page.tsx`, navbar badge
+- [x] POST `app/api/cart/items/route.ts` → add item `{ productVariantId, quantity }`
+  - Used by: Product detail “Add to cart”
+- [x] PATCH `app/api/cart/items/[id]/route.ts` → update quantity
+  - Used by: cart page quantity controls (0 removes)
+- [x] DELETE `app/api/cart/items/[id]/route.ts` → remove item
   - Used by: cart page remove action
 
 3) Addresses (authenticated)

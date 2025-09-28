@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { cartCountQuery } from "@/features/cart/queries";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +44,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 export default function Navbar() {
   const { data: session } = authClient.useSession();
   const user = session?.user as UserWithRole;
+  const { data: cartCount, isLoading: cartLoading } = useQuery(cartCountQuery.getCount());
 
   return (
     <header className="border-b bg-background">
@@ -60,7 +63,16 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/cart">Cart</Link>
+            <Link href="/cart" className="relative">
+              Cart
+              {cartLoading ? (
+                <span className="ml-1 inline-block h-2 w-2 rounded-full bg-accent animate-pulse align-middle" />
+              ) : typeof cartCount === "number" && cartCount > 0 ? (
+                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] px-1.5 min-w-5 h-5">
+                  {cartCount}
+                </span>
+              ) : null}
+            </Link>
           </Button>
           {user ? (
             <DropdownMenu>

@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { productQueries } from "@/features/products/queries";
+import { cartMutations } from "@/features/cart/queries";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Page() {
   const params = useParams();
@@ -10,6 +12,14 @@ export default function Page() {
   const { data, isLoading, isError, error } = useQuery(
     slug ? productQueries.fetchProduct(slug) : { queryKey: ["product", "missing"], queryFn: async () => { throw new Error("Missing slug"); } }
   );
+  const qc = useQueryClient();
+  const addItem = useMutation({
+    ...cartMutations.addItem(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cart"] });
+      qc.invalidateQueries({ queryKey: ["cartCount"] });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -65,9 +75,16 @@ export default function Page() {
           <p className="text-sm text-muted-foreground whitespace-pre-line">{data.description}</p>
         ) : null}
         <div className="pt-2">
-          <button className="px-4 py-2 rounded bg-primary text-primary-foreground disabled:opacity-50" disabled>
-            Add to cart (coming soon)
+          <button
+            className="px-4 py-2 rounded bg-primary text-primary-foreground disabled:opacity-50"
+            disabled={!v || addItem.isPending}
+            onClick={() => v && addItem.mutate({ productVariantId: v.id, quantity: 1 })}
+          >
+            {addItem.isPending ? "Adding..." : "Add to cart"}
           </button>
+          {addItem.isError ? (
+            <p className="text-xs text-destructive mt-2">{String((addItem.error as Error)?.message || "Failed to add to cart")}</p>
+          ) : null}
         </div>
       </div>
     </div>
